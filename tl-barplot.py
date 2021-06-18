@@ -114,15 +114,18 @@ xaxis = None
 legend_bbox = (0., 0., -0.07, -0.03)
 legend_loc = 2
 
-for l in tldata.level_order(data):
+for l_idx, l in enumerate(tldata.level_order(data)):
     non_null = [x for x in levels[l] if valid_row(ratios[x])]
     if not non_null:
         n += 1
         continue
     all_colors = get_colors(non_null)
-    ax = plt.subplot2grid((numplots, 1), (n, 0), sharex=xaxis)
-    plt.tight_layout()
-    set_title(ax, l)
+    #ax = plt.subplot2grid((1, 1), (0, 0), sharex=xaxis)
+    #ax=plt.axis()
+    ax = plt.gca()
+    #plt.tight_layout()
+    plt.title(l)
+    #set_title(ax, l)
     r = [[y if y == y else 0.0 for y in ratios[x]] for x in non_null]
 
     if gen_level.is_metric(non_null[0]):
@@ -137,7 +140,7 @@ for l in tldata.level_order(data):
         if not math.isnan(low) and not math.isnan(high):
             ax.yaxis.set_ticks([low, math.trunc(((high - low) / 2.0) / 100.) * 100., high])
     else:
-        stack = ax.stackplot(timestamps, *r, colors=all_colors)
+        stack = plt.stackplot(timestamps, *r, colors=all_colors)
         ax.set_ylim(0, 100)
         ax.yaxis.set_ticks([0., 50., 100.])
         p = [plt.Rectangle((0, 0), 1, 1, fc=pc.get_facecolor()[0]) for pc in stack]
@@ -159,17 +162,17 @@ for l in tldata.level_order(data):
     #ax.margins(0, 0)
     n += 1
 
-if len(timestamps) == 1:
-    plt.gca().axes.get_xaxis().set_visible(False)
+    if len(timestamps) == 1:
+        plt.gca().axes.get_xaxis().set_visible(False)
 
-plt.subplots_adjust(hspace=1.5 if max_legend > 6 else 0.9, bottom=0.20,
-                    top=0.95)
+    plt.subplots_adjust(hspace=1.5 if max_legend > 6 else 0.9, bottom=0.20,
+                        top=0.95)
 
-if args.title:
-    #plt.subplot(numplots, 1, 1)
-    plt.title(args.title)
+    if args.title:
+        #plt.subplot(numplots, 1, 1)
+        plt.title(args.title)
 
-if args.output:
-    plt.savefig(args.output)
-else:
-    plt.show()
+    if args.output:
+        plt.savefig(args.output[:-3]+str(l_idx)+".png")
+    else:
+        plt.show()
