@@ -115,6 +115,7 @@ legend_bbox = (0., 0., -0.07, -0.03)
 legend_loc = 2
 
 for l_idx, l in enumerate(tldata.level_order(data)):
+    f=plt.figure()
     non_null = [x for x in levels[l] if valid_row(ratios[x])]
     if not non_null:
         n += 1
